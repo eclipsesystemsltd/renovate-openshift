@@ -1,0 +1,40 @@
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: is-renovate-bot
+spec:
+  source:
+    git:
+      uri: >-
+        https://DSO_IML_CICD_User_1@bitbucket.org/lowside/is-renovate-testing.git
+      ref: "lewis-dev"
+      commit: "latest"
+      httpProxy: http://10.210.195.1:8080
+      httpsProxy: http://10.210.195.1:8080
+      noProxy: .local,169.254.169.254,10.,localhost,127.0.0.,engineering,10.1.0.0/16,172.30.0.0/16
+    sourceSecret:
+      name: iml-cicd-account
+    type: Git
+  strategy:
+    dockerStrategy:
+      buildArgs:
+        - name: "http_proxy"
+          valueFrom:
+            configMapKeyRef:
+              key: HTTP_PROXY
+              name: http-proxy
+        - name: "https_proxy"
+          valueFrom:
+            configMapKeyRef:
+              key: HTTP_PROXY
+              name: http-proxy
+        - name: "no_proxy"
+          valueFrom:
+            configMapKeyRef:
+              key: NO_PROXY
+              name: http-proxy
+      type: Docker
+  output:
+    to:
+      kind: "ImageStreamTag"
+      name: "is-renovate-bot:latest"
